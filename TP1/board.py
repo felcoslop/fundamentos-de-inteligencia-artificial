@@ -12,14 +12,13 @@ class Board:
     def __init__(self):
         self.rows = ROWS
         self.cols = COLS
-        self.board = np.zeros(shape=(self.rows, self.cols), dtype=str)
+        self.board = np.zeros(shape=(self.rows, self.cols), dtype=int)
 
     def init_board(self):
         """
-        Initialize the board with numbers from 1 to 15 and an _.
+        Initialize the board with numbers from 0 to 15.
         """
-        numbers = list(range(1, self.rows * self.cols))
-        numbers.append("_")
+        numbers = list(range(0, self.rows * self.cols))
         np.random.shuffle(numbers)
         self.board = np.array(numbers).reshape(self.rows, self.cols)
 
@@ -39,16 +38,13 @@ class Board:
                 ):
                     inversions += 1
 
-        blank_tile_row, _ = np.where(self.board == "_")
+        blank_tile_row, _ = np.where(self.board == 0)
 
         blank_tile_row_from_bottom = self.rows - blank_tile_row[0]
-        print("Index do caracter '_' a partir da base", blank_tile_row_from_bottom)
+        print("Index do número 0:", blank_tile_row_from_bottom)
         print("Paridade:", inversions)
 
-        # if (blank_tile_row_from_bottom % 2 == 0 and inversions % 2 != 0) or (
-        #    blank_tile_row_from_bottom % 2 != 0 and inversions % 2 == 0
-        # ):
-        if blank_tile_row_from_bottom % 2 == 0:
+        if blank_tile_row_from_bottom % 2 != 0:
             return inversions % 2 == 0
 
         else:
