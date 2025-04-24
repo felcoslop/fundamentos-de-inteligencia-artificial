@@ -16,13 +16,23 @@ class Board:
         self.cols = COLS
         self.board = np.zeros(shape=(self.rows, self.cols), dtype=int)
 
-    def init_board(self):
+    def init_board(self, initial_state=None):
         """
-        Inicializa o tabuleiro com números de 0 a 15.
+        Inicializa o tabuleiro.
+        - Se `initial_state` for fornecido, usa-o como estado inicial.
+        - Caso contrário, gera um tabuleiro aleatório.
         """
-        numbers = list(range(0, self.rows * self.cols))
-        np.random.shuffle(numbers)
-        self.board = np.array(numbers).reshape(self.rows, self.cols)
+        if initial_state:
+            # Usa o estado inicial fornecido
+            self.board = np.array(initial_state).reshape(self.rows, self.cols)
+            self.check_is_solvable()
+            if not self.check_is_solvable():
+                raise ValueError("O tabuleiro inicial não é solucionável.")
+        else:
+            # Gera um tabuleiro aleatório
+            numbers = list(range(0, self.rows * self.cols))
+            np.random.shuffle(numbers)
+            self.board = np.array(numbers).reshape(self.rows, self.cols)
 
     def check_is_solvable(self):
         """
@@ -75,38 +85,12 @@ class Board:
                 neighbors.append(new_state.flatten().tolist())
 
         return neighbors
-    
-    def manhattan_distance(self, state, goal_state):
-        """
-        Calcula a soma das distâncias de Manhattan para todas as peças.
-        """
-        state = np.array(state).reshape(self.rows, self.cols)
-        goal_state = np.array(goal_state).reshape(self.rows, self.cols)
-        distance = 0
 
-        for i in range(self.rows):
-            for j in range(self.cols):
-                value = state[i, j]
-                if value != 0:  # Ignora o espaço vazio
-                    goal_i, goal_j = divmod(goal_state.flatten().tolist().index(value), self.cols)
-                    distance += abs(i - goal_i) + abs(j - goal_j)
-
-        return distance
-    
     def misplaced_tiles(self, state, goal_state):
         """
         Conta o número de peças fora do lugar.
         """
-        # Garante que state e goal_state sejam arrays do NumPy
-        state = np.array(state).flatten()
-        goal_state = np.array(goal_state).flatten()
-
-        # Verifica se os tamanhos são iguais
-        if state.size != goal_state.size:
-            raise ValueError(f"Tamanhos incompatíveis: state ({state.size}) e goal_state ({goal_state.size})")
-
-        # Conta as peças fora do lugar, ignorando o 0
-        return np.sum((state != goal_state) & (goal_state != 0))
+        return np.sum(state != goal_state) - 1  # Ignora o 0
     
     def cost(self, path):
         """
