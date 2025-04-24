@@ -75,47 +75,41 @@ class Board:
                 neighbors.append(new_state.flatten().tolist())
 
         return neighbors
-
-    def bfs(self, initial_state):
+    
+    def manhattan_distance(self, state, goal_state):
         """
-        Breadth-First-Search to solve the 15 puzzle.
-
-        1. Começa no estado inicial (puzzle em uma configuração aleatória)
-        2. Coloca o estado inicial na fila
-        3. Retira o estado da fila
-        4. Veja se é solução
-        5. Se não for solução, gere os vizinhos possíveis (movimentos do 0)
-        6. Adicione os vizinhos na fila
-        7. Veja se é solução (se não for, repete desde o passo 3)
+        Calcula a soma das distâncias de Manhattan para todas as peças.
         """
-        initial_state = initial_state.flatten().tolist()
-        goal_state = list(range(1, self.rows * self.cols)) + [0]
-        queue = deque()
-        visited = set()
+        state = np.array(state).reshape(self.rows, self.cols)
+        goal_state = np.array(goal_state).reshape(self.rows, self.cols)
+        distance = 0
 
-        queue.append((initial_state, []))
+        for i in range(self.rows):
+            for j in range(self.cols):
+                value = state[i, j]
+                if value != 0:  # Ignora o espaço vazio
+                    goal_i, goal_j = divmod(goal_state.flatten().tolist().index(value), self.cols)
+                    distance += abs(i - goal_i) + abs(j - goal_j)
 
-        while queue:
-            current_state, path = queue.popleft()
-            state_tuple = tuple(current_state)
+        return distance
+    
+    def misplaced_tiles(self, state, goal_state):
+        """
+        Conta o número de peças fora do lugar.
+        """
+        # Garante que state e goal_state sejam arrays do NumPy
+        state = np.array(state).flatten()
+        goal_state = np.array(goal_state).flatten()
 
-            if state_tuple in visited:
-                continue
-            visited.add(state_tuple)
+        # Verifica se os tamanhos são iguais
+        if state.size != goal_state.size:
+            raise ValueError(f"Tamanhos incompatíveis: state ({state.size}) e goal_state ({goal_state.size})")
 
-            if current_state == goal_state:
-                return path + [current_state]
-
-            for neighbors in self.get_neighbors(current_state):
-                if tuple(neighbors) not in visited:
-                    queue.append((neighbors, path + [current_state]))
-        return None
-
-
-board1 = Board()
-board1.init_board()
-print(board1.board)
-if board1.check_is_solvable():
-    print(board1.bfs(board1.board))
-
-# print(board1.get_neighbors(board1.board))
+        # Conta as peças fora do lugar, ignorando o 0
+        return np.sum((state != goal_state) & (goal_state != 0))
+    
+    def cost(self, path):
+        """
+        Calcula o custo acumulado (g(n)) com base no número de movimentos realizados.
+        """
+        return len(path)
