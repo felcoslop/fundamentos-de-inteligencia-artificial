@@ -37,7 +37,7 @@ class Agent:
         visited = set()
         nodes_expanded = 0  # Contador de nós expandidos
 
-        start_time = time.time()  # Inicia o cronômetro
+        start_time = time.perf_counter()  # Inicia o cronômetro
 
         while queue:
             current_state, path = queue.popleft()
@@ -50,7 +50,7 @@ class Agent:
 
             # Verifica se o estado atual é a solução
             if current_state == goal_state:
-                end_time = time.time()  # Para o cronômetro
+                end_time = time.perf_counter()  # Para o cronômetro
                 return {
                     "solution": path + [current_state],
                     "nodes_expanded": nodes_expanded,
@@ -63,7 +63,7 @@ class Agent:
                 if tuple(neighbors) not in visited:
                     queue.append((neighbors, path + [current_state]))
 
-        end_time = time.time()  # Para o cronômetro
+        end_time = time.perf_counter()  # Para o cronômetro
         return {
             "solution": None,
             "nodes_expanded": nodes_expanded,
@@ -94,7 +94,7 @@ class Agent:
         visited = set()
         nodes_expanded = 0  # Contador de nós expandidos
 
-        start_time = time.time()  # Inicia o cronômetro
+        start_time = time.perf_counter()  # Inicia o cronômetro
 
         while stack:
             current_state, path = stack.pop()
@@ -107,7 +107,7 @@ class Agent:
 
             # Verifica se o estado atual é a solução
             if current_state == goal_state:
-                end_time = time.time()  # Para o cronômetro
+                end_time = time.perf_counter()  # Para o cronômetro
                 return {
                     "solution": path + [current_state],
                     "nodes_expanded": nodes_expanded,
@@ -120,7 +120,7 @@ class Agent:
                 if tuple(neighbors) not in visited:
                     stack.append((neighbors, path + [current_state]))
 
-        end_time = time.time()  # Para o cronômetro
+        end_time = time.perf_counter()  # Para o cronômetro
         return {
             "solution": None,
             "nodes_expanded": nodes_expanded,
@@ -147,7 +147,7 @@ class Agent:
         # Adiciona o estado inicial na fila de prioridade
         heappush(priority_queue, (0, 0, initial_state, []))  # (f(n), g(n), estado, caminho)
 
-        start_time = time.time()  # Inicia o cronômetro
+        start_time = time.perf_counter()  # Inicia o cronômetro
 
         while priority_queue:
             _, g, current_state, path = heappop(priority_queue)
@@ -160,7 +160,7 @@ class Agent:
 
             # Verifica se o estado atual é a solução
             if current_state == goal_state:
-                end_time = time.time()  # Para o cronômetro
+                end_time = time.perf_counter()  # Para o cronômetro
                 return {
                     "solution": path + [current_state],
                     "nodes_expanded": nodes_expanded,
@@ -176,7 +176,7 @@ class Agent:
                     f = g_new + h                                                                    # Calcula f(n)
                     heappush(priority_queue, (f, g_new, neighbors, path + [current_state]))
 
-        end_time = time.time()  # Para o cronômetro
+        end_time = time.perf_counter()  # Para o cronômetro
         return {
             "solution": None,
             "nodes_expanded": nodes_expanded,
@@ -204,7 +204,7 @@ class Agent:
         # Adiciona o estado inicial na fila de prioridade
         heappush(priority_queue, (0, 0, initial_state, []))  # (f(n), g(n), estado, caminho)
 
-        start_time = time.time()  # Inicia o cronômetro
+        start_time = time.perf_counter()  # Inicia o cronômetro
 
         while priority_queue:
             _, g, current_state, path = heappop(priority_queue)
@@ -217,7 +217,7 @@ class Agent:
 
             # Verifica se o número de movimentos excede o limite
             if len(path) > max_moves:
-                end_time = time.time()  # Para o cronômetro
+                end_time = time.perf_counter()  # Para o cronômetro
                 return {
                     "solution": None,
                     "nodes_expanded": nodes_expanded,
@@ -228,7 +228,7 @@ class Agent:
 
             # Verifica se o estado atual é a solução
             if current_state == goal_state:
-                end_time = time.time()  # Para o cronômetro
+                end_time = time.perf_counter()  # Para o cronômetro
                 return {
                     "solution": path + [current_state],
                     "nodes_expanded": nodes_expanded,
@@ -245,7 +245,7 @@ class Agent:
                     f = g_new + h  # Calcula f(n)
                     heappush(priority_queue, (f, g_new, neighbors, path + [current_state]))
 
-        end_time = time.time()  # Para o cronômetro
+        end_time = time.perf_counter()  # Para o cronômetro
         return {
             "solution": None,
             "nodes_expanded": nodes_expanded,

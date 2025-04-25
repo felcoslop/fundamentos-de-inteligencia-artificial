@@ -53,8 +53,8 @@ class Board:
         blank_tile_row, _ = np.where(self.board == 0)
 
         blank_tile_row_from_bottom = self.rows - blank_tile_row[0]
-        print("Index do número 0:", blank_tile_row_from_bottom)
-        print("Paridade:", inversions)
+        ##print("Index do número 0:", blank_tile_row_from_bottom)
+        ##print("Paridade:", inversions)
 
         if blank_tile_row_from_bottom % 2 != 0:
             return inversions % 2 == 0

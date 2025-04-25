@@ -1,7 +1,7 @@
 from board import Board
 from agent import Agent
 from tabulate import tabulate  # Biblioteca para formatar a saída como tabela
-
+import numpy as np
 
 def initialize_board(use_random):
     """
@@ -88,24 +88,76 @@ def solve_and_collect_results(agent, max_moves=50):
     return results
 
 
+def compare_methods(num_trials=5, max_moves=100):
+    """
+    Executa os métodos de busca em várias configurações iniciais e calcula métricas médias.
+    """
+    # Estruturas para armazenar métricas
+    metrics = {
+        "A*": {"nodes_expanded": [], "moves": [], "time": []},
+        "BFS": {"nodes_expanded": [], "moves": [], "time": []},
+        "DFS": {"nodes_expanded": [], "moves": [], "time": []}
+    }
+
+    for trial in range(num_trials):
+        print(f"\n=== Teste {trial + 1}/{num_trials} ===")
+        # Inicializa um tabuleiro aleatório solucionável
+        board = initialize_board(use_random=True)
+        print("Tabuleiro inicial:")
+        print(board.board)
+
+        # Inicializa o agente
+        agent = Agent(board)
+
+        # Executa os métodos de busca
+        results = solve_and_collect_results(agent, max_moves=max_moves)
+
+        # Coleta métricas de cada método
+        for method, nodes, moves, time in results:
+            if nodes != "N/A":
+                metrics[method]["nodes_expanded"].append(int(nodes))
+                metrics[method]["moves"].append(int(moves))
+                metrics[method]["time"].append(float(time.split()[0]))  # Extrai o valor numérico do tempo
+            else:
+                metrics[method]["nodes_expanded"].append(0)
+                metrics[method]["moves"].append(0)
+                metrics[method]["time"].append(0)
+
+    # Calcula médias
+    summary = []
+    for method in metrics:
+        nodes_avg = np.mean(metrics[method]["nodes_expanded"]) if metrics[method]["nodes_expanded"] else "N/A"
+        moves_avg = np.mean(metrics[method]["moves"]) if metrics[method]["moves"] else "N/A"
+        time_avg = np.mean(metrics[method]["time"]) if metrics[method]["time"] else "N/A"
+        summary.append([
+            method,
+            f"{nodes_avg:.2f}" if isinstance(nodes_avg, float) else nodes_avg,
+            f"{moves_avg:.2f}" if isinstance(moves_avg, float) else moves_avg,
+            f"{time_avg:.4f} segundos" if isinstance(time_avg, float) else time_avg
+        ])
+
+    # Exibe resultados médios
+    print(f"\n=== Resumo após {num_trials} testes ===")
+    display_results(summary)
+
 if __name__ == "__main__":
     import argparse
 
     # Configuração de argumentos
     parser = argparse.ArgumentParser(description="15-Puzzle Solver")
     parser.add_argument("--random", action="store_true", help="Usar tabuleiro aleatório")
+    parser.add_argument("--compare", action="store_true", help="Executar comparação de métodos")
+    parser.add_argument("--trials", type=int, default=5, help="Número de testes para comparação")
     args = parser.parse_args()
 
-    # Inicializa o tabuleiro
-    board = initialize_board(use_random=args.random)
-    print("Tabuleiro inicial:")
-    print(board.board)
-
-    # Inicializa o agente
-    agent = Agent(board)
-
-    # Resolve o problema e coleta os resultados
-    results = solve_and_collect_results(agent, max_moves=100)
-
-    # Exibe os resultados em formato de tabela
-    display_results(results)
+    if args.compare:
+            # Executa a comparação com múltiplos testes
+            compare_methods(num_trials=args.trials, max_moves=100)
+    else:
+        # Executa o fluxo original para um único tabuleiro
+        board = initialize_board(use_random=args.random)
+        print("Tabuleiro inicial:")
+        print(board.board)
+        agent = Agent(board)
+        results = solve_and_collect_results(agent, max_moves=100)
+        display_results(results)
